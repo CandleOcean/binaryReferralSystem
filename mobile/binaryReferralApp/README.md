@@ -18,7 +18,15 @@ A React Native mobile application for the Binary Referral System that allows use
   - Left and right leg totals (sqm)
   - Carry-over tracking
   - Personal floor size
+- **Floor Status**: View floor condition and community rating
+- **Network Tree Visualization**: Interactive binary tree view
+  - Visual representation of your downline
+  - Expandable/collapsible nodes
+  - Color-coded status indicators
+  - Adjustable depth (2-4 levels)
+  - Shows earnings, floor size, and ratings
 - **Referral Sharing**: Share your referral code via native share
+- **Growth Projections**: View 6-month earnings forecast
 - **Pull to Refresh**: Update earnings and stats in real-time
 - **Logout**: Secure session management
 
@@ -50,9 +58,10 @@ src/
 ├── navigation/
 │   └── AppNavigator.tsx   # Navigation setup
 └── screens/
-    ├── LoginScreen.tsx    # Phone-based login
-    ├── RegisterScreen.tsx # User registration
-    └── DashboardScreen.tsx # Main dashboard
+    ├── LoginScreen.tsx        # Phone-based login
+    ├── RegisterScreen.tsx     # User registration
+    ├── DashboardScreen.tsx    # Main dashboard
+    └── NetworkTreeScreen.tsx  # Network tree visualization
 ```
 
 ## UI Design
@@ -95,9 +104,10 @@ src/
 
 ## Future Enhancements
 
-- [ ] Network tree visualization
-- [ ] Earnings history and analytics
+- [x] Network tree visualization ✅
 - [ ] Push notifications for new recruits
 - [ ] Withdrawal/payout functionality
 - [ ] Profile management
 - [ ] Dark mode support
+- [ ] Offline mode with sync
+- [ ] Photo upload for floor inspections

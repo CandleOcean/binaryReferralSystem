@@ -1,0 +1,18 @@
+### Create Root User (First User)
+POST http://192.168.1.5:4000/api/users/register
+Content-Type: application/json
+
+{
+  "name": "Test Root User",
+  "phone": "+256700000001",
+  "floorSizeSqm": 15
+}
+
+### Get all users to see referral codes
+GET http://192.168.1.5:4000/debug/users
+
+### Login by phone
+GET http://192.168.1.5:4000/api/users/phone/+256700000001
+
+### Verify referral code
+GET http://192.168.1.5:4000/api/users/referral-code/PASTE_CODE_HERE

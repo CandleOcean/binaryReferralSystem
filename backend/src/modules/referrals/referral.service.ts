@@ -42,21 +42,31 @@ const updateUplineEarnings = async (
   floorSizeSqm: number
 ) => {
   let currentUser = await User.findById(placementParentId)
+  let level = 0
 
   while (currentUser) {
+    level++
+    console.log(`\n🔼 Level ${level}: ${currentUser.name}`)
+    console.log(`   Before: leftLeg=${currentUser.leftLegSqm}, rightLeg=${currentUser.rightLegSqm}`)
+    
     // Add sqm to the appropriate leg
     if (position === "left") {
       currentUser.leftLegSqm += floorSizeSqm
     } else {
       currentUser.rightLegSqm += floorSizeSqm
     }
+    
+    console.log(`   After: leftLeg=${currentUser.leftLegSqm}, rightLeg=${currentUser.rightLegSqm}`)
 
     // Calculate new pairs
     const minLegSqm = Math.min(currentUser.leftLegSqm, currentUser.rightLegSqm)
     const newPairsSqm = minLegSqm - currentUser.matchedPairsSqm
+    
+    console.log(`   Pairs: min=${minLegSqm}, matched=${currentUser.matchedPairsSqm}, new=${newPairsSqm}`)
 
     if (newPairsSqm > 0) {
       const pairEarning = newPairsSqm * PAIR_BONUS_PER_SQM
+      console.log(`   💰 Pair bonus: ${newPairsSqm} sqm × ${PAIR_BONUS_PER_SQM} = ${pairEarning} UGX`)
       currentUser.pairBonus += pairEarning
       currentUser.totalEarnings += pairEarning
       currentUser.matchedPairsSqm = minLegSqm
@@ -65,6 +75,9 @@ const updateUplineEarnings = async (
     // Update carry-over
     currentUser.carryLeftSqm = currentUser.leftLegSqm - currentUser.matchedPairsSqm
     currentUser.carryRightSqm = currentUser.rightLegSqm - currentUser.matchedPairsSqm
+    
+    console.log(`   Carry: left=${currentUser.carryLeftSqm}, right=${currentUser.carryRightSqm}`)
+    console.log(`   Total earnings: ${currentUser.totalEarnings}`)
 
     await currentUser.save()
 
@@ -93,21 +106,34 @@ const updateUplineEarnings = async (
 export const registerWithReferral = async ({
   name,
   phone,
-  referrerId,
+  referredBy,
+  referralCode,
   floorSizeSqm,
+  district,
+  village,
 }: {
   name: string
   phone: string
-  referrerId?: string
+  referredBy?: string // User ID of referrer
+  referralCode?: string // Referral code (alternative to referredBy)
   floorSizeSqm: number
+  district?: string
+  village?: string
 }) => {
-  // ROOT USER (no referrer)
-  if (!referrerId) {
-    return await User.create({ name, phone, floorSizeSqm })
+  // ROOT USER (no referral)
+  if (!referredBy && !referralCode) {
+    return await User.create({ name, phone, floorSizeSqm, district, village })
   }
 
-  const actualReferrer = await User.findById(referrerId)
-  if (!actualReferrer) throw new Error("Referrer not found")
+  // Find referrer by ID or referral code
+  let actualReferrer
+  if (referredBy) {
+    actualReferrer = await User.findById(referredBy)
+  } else if (referralCode) {
+    actualReferrer = await User.findOne({ referralCode })
+  }
+  
+  if (!actualReferrer) throw new Error("Invalid referral code or referrer ID")
 
   // Find placement under referrer tree
   const { parentId, position } = await findPlacement(actualReferrer._id)
@@ -118,18 +144,28 @@ export const registerWithReferral = async ({
     phone,
     referredBy: actualReferrer._id,
     floorSizeSqm,
+    district,
+    village,
   })
 
-  // Attach to binary tree
-  await User.findByIdAndUpdate(parentId, {
+  // Attach to binary tree and track who referred this child
+  const updateFields: any = {
     [position === "left" ? "leftChild" : "rightChild"]: newUser._id,
-  })
+    [position === "left" ? "leftReferredBy" : "rightReferredBy"]: actualReferrer._id,
+  }
+  
+  await User.findByIdAndUpdate(parentId, updateFields)
 
   // Direct bonus ONLY to actual referrer (one-time)
   const directBonusAmount = floorSizeSqm * DIRECT_BONUS_PER_SQM
+  console.log(`💵 Calculating direct bonus: ${floorSizeSqm} sqm × ${DIRECT_BONUS_PER_SQM} = ${directBonusAmount} UGX`)
+  console.log(`💰 Referrer before: directBonus=${actualReferrer.directBonus}, totalEarnings=${actualReferrer.totalEarnings}`)
+  
   actualReferrer.directBonus += directBonusAmount
   actualReferrer.totalEarnings += directBonusAmount
   await actualReferrer.save()
+  
+  console.log(`💰 Referrer after: directBonus=${actualReferrer.directBonus}, totalEarnings=${actualReferrer.totalEarnings}`)
 
   // Update entire upline with pair bonuses
   await updateUplineEarnings(parentId, position, floorSizeSqm)

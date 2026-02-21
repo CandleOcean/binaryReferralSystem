@@ -4,11 +4,13 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import LoginScreen from '../screens/LoginScreen'
 import RegisterScreen from '../screens/RegisterScreen'
 import DashboardScreen from '../screens/DashboardScreen'
+import NetworkTreeScreen from '../screens/NetworkTreeScreen'
 
 export type RootStackParamList = {
   Login: undefined
   Register: undefined
   Dashboard: undefined
+  NetworkTree: undefined
 }
 
 const Stack = createNativeStackNavigator<RootStackParamList>()
@@ -20,6 +22,7 @@ export default function AppNavigator() {
         <Stack.Screen name="Login" component={LoginScreen} />
         <Stack.Screen name="Register" component={RegisterScreen} />
         <Stack.Screen name="Dashboard" component={DashboardScreen} />
+        <Stack.Screen name="NetworkTree" component={NetworkTreeScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   )

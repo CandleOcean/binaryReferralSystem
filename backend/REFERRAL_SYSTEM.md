@@ -104,6 +104,48 @@ When someone joins the network:
 }
 ```
 
+## API Usage
+
+### Registration with Referral Code
+
+**POST /api/users/register**
+```json
+{
+  "name": "John Doe",
+  "phone": "+256700123456",
+  "referralCode": "A1B2C3D4",  // Optional - the referrer's code
+  "floorSizeSqm": 15
+}
+```
+
+**Response:**
+```json
+{
+  "_id": "...",
+  "name": "John Doe",
+  "phone": "+256700123456",
+  "referralCode": "E5F6G7H8",  // Auto-generated unique code
+  "referredBy": "...",
+  "floorSizeSqm": 15,
+  "totalEarnings": 0,
+  ...
+}
+```
+
+### Get User by Referral Code
+
+**GET /api/users/referral-code/:code**
+
+Returns basic info about the user with that referral code.
+
+## How Referral Codes Work
+
+1. **Auto-Generation**: Every user gets a unique 8-character referral code (e.g., "A1B2C3D4")
+2. **Sharing**: Users share their code with people they want to recruit
+3. **Registration**: New users enter the referral code during signup
+4. **Placement**: System finds the first available spot in the referrer's tree
+5. **Rewards**: Referrer gets direct bonus, entire upline gets pair bonuses
+
 ## API Functions
 
 ### `registerWithReferral()`

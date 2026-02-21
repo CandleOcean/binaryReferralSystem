@@ -25,26 +25,27 @@ export async function simulateGrowthScenario() {
   })
   
   console.log("✅ Root user created:", rootUser.name)
+  console.log("📋 Referral Code:", rootUser.referralCode)
   
-  // First direct recruit (left)
+  // First direct recruit (left) - using referral code
   const user2 = await registerWithReferral({
     name: "Bob",
     phone: "+256700000002",
-    referrerId: rootUser._id.toString(),
+    referralCode: rootUser.referralCode || undefined,
     floorSizeSqm: 15,
   })
   
-  console.log("✅ Bob joined (left leg)")
+  console.log("✅ Bob joined (left leg) using code:", rootUser.referralCode)
   
-  // Second direct recruit (right)
+  // Second direct recruit (right) - using referral code
   const user3 = await registerWithReferral({
     name: "Carol",
     phone: "+256700000003",
-    referrerId: rootUser._id.toString(),
+    referralCode: rootUser.referralCode || undefined,
     floorSizeSqm: 15,
   })
   
-  console.log("✅ Carol joined (right leg)")
+  console.log("✅ Carol joined (right leg) using code:", rootUser.referralCode)
   console.log("\n📊 After Month 1:")
   
   const stats = await getUserStats(rootUser._id.toString())

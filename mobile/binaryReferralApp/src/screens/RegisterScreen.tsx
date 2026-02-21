@@ -26,6 +26,8 @@ export default function RegisterScreen() {
   const [phone, setPhone] = useState('')
   const [floorSize, setFloorSize] = useState('15')
   const [referralCode, setReferralCode] = useState('')
+  const [district, setDistrict] = useState('')
+  const [village, setVillage] = useState('')
   const [loading, setLoading] = useState(false)
 
   const handleRegister = async () => {
@@ -46,7 +48,9 @@ export default function RegisterScreen() {
         name: name.trim(),
         phone: phone.trim(),
         floorSizeSqm,
-        ...(referralCode.trim() && { referredBy: referralCode.trim() }),
+        ...(referralCode.trim() && { referralCode: referralCode.trim() }),
+        ...(district.trim() && { district: district.trim() }),
+        ...(village.trim() && { village: village.trim() }),
       }
 
       const user = await registerUser(data)
@@ -115,6 +119,30 @@ export default function RegisterScreen() {
             </View>
 
             <View style={styles.inputGroup}>
+              <Text style={styles.label}>District (Optional)</Text>
+              <TextInput
+                style={styles.input}
+                placeholder="Enter your district"
+                value={district}
+                onChangeText={setDistrict}
+                autoCapitalize="words"
+                editable={!loading}
+              />
+            </View>
+
+            <View style={styles.inputGroup}>
+              <Text style={styles.label}>Village (Optional)</Text>
+              <TextInput
+                style={styles.input}
+                placeholder="Enter your village"
+                value={village}
+                onChangeText={setVillage}
+                autoCapitalize="words"
+                editable={!loading}
+              />
+            </View>
+
+            <View style={styles.inputGroup}>
               <Text style={styles.label}>Referral Code (Optional)</Text>
               <TextInput
                 style={styles.input}
@@ -159,6 +187,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#f8f9fa',
+    color: 'grey'
   },
   scrollContent: {
     flexGrow: 1,
@@ -167,6 +196,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     padding: 24,
+    color: 'grey'
   },
   header: {
     alignItems: 'center',
@@ -202,6 +232,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     padding: 16,
     fontSize: 16,
+    color: 'grey'
   },
   hint: {
     fontSize: 12,
